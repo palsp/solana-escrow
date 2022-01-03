@@ -1,0 +1,260 @@
+{
+  "version": "0.1.0",
+  "name": "halffin",
+  "instructions": [
+    {
+      "name": "initializeProduct",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "productAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenToReceiveAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "lockPeriod",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "createOrder",
+      "accounts": [
+        {
+          "name": "buyer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "productAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tempTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updateShippingDetail",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "productAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "trackingId",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "fulfillShippingDetail",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "productAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdrawFund",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "productAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tempTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sellerTokenToReceiveAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Product",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "trackingId",
+            "type": {
+              "array": [
+                "u8",
+                10
+              ]
+            }
+          },
+          {
+            "name": "seller",
+            "type": "publicKey"
+          },
+          {
+            "name": "buyer",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "lockPeriod",
+            "type": "u64"
+          },
+          {
+            "name": "stage",
+            "type": {
+              "defined": "Stage"
+            }
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "tempTokenAccountPubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenToReceiveAccountPubkey",
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "Stage",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Initiate"
+          },
+          {
+            "name": "WaitForShipping"
+          },
+          {
+            "name": "ShippingInProgress"
+          },
+          {
+            "name": "Delivered"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidTrackingId",
+      "msg": "invalid tracking id"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidStage",
+      "msg": "invalid stage"
+    },
+    {
+      "code": 6002,
+      "name": "InsufficientFund",
+      "msg": "insufficient fund"
+    }
+  ],
+  "metadata": {
+    "address": "28Y6Ezy4za168iKHsWb1iUih7pDw1NzBWFJ4Kya8FmQb"
+  }
+}
