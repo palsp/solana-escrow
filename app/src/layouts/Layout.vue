@@ -4,6 +4,9 @@
     <nav class="nav-items">
       <router-link class="nav-item" to="/">Home</router-link>
       <router-link class="nav-item" to="/about">About</router-link>
+      <router-link v-if="connected" class="nav-item" to="/profile"
+        >Profile</router-link
+      >
       <router-link v-if="connected" class="nav-item" to="/new"
         >New Product</router-link
       >

@@ -13,6 +13,12 @@ const routes = [
     component: require("@/pages/NewProduct.vue").default,
     meta: { requireConnected: true },
   },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: require("@/pages/Profile.vue").default,
+    meta: { requireConnected: true },
+  },
 ];
 
 const router = createRouter({
