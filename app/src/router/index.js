@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "@/pages/Home.vue";
-
+import store from "@/store";
 const routes = [
   {
     path: "/",
@@ -11,12 +11,23 @@ const routes = [
     path: "/new",
     name: "NewProduct",
     component: require("@/pages/NewProduct.vue").default,
+    meta: { requireConnected: true },
   },
 ];
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const connected = store.getters["wallet/connected"];
+  if (to.meta.requireConnected && !connected) {
+    next("/");
+    return;
+  }
+
+  next();
 });
 
 export default router;

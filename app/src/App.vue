@@ -1,13 +1,7 @@
 <template>
   <wallet-provider :wallets="wallets">
     <workspace-provider>
-      <div id="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link> |
-        <router-link to="/new">New Product</router-link> |
-        <connect-wallet></connect-wallet>
-      </div>
-      <router-view />
+      <layout />
     </workspace-provider>
   </wallet-provider>
 </template>
@@ -17,12 +11,17 @@ import {
   getPhantomWallet,
   getSolflareWallet,
 } from "@solana/wallet-adapter-wallets";
-import ConnectWallet from "@/components/ConnectWallet.vue";
+
 import { WalletProvider } from "@solana/wallet-adapter-vue";
 import WorkspaceProvider from "@/components/provider/WorkspaceProvider";
+import Layout from "@/layouts/Layout.vue";
 
 export default {
-  components: { ConnectWallet, WalletProvider, WorkspaceProvider },
+  components: {
+    WalletProvider,
+    WorkspaceProvider,
+    Layout,
+  },
   setup() {
     const wallets = [getPhantomWallet(), getSolflareWallet()];
 
