@@ -1,14 +1,20 @@
 export class Product {
   #publicKey;
-  constructor(
-    publicKey,
-    { name = "", description = "", price = 0, lockPeriod = 0 } = {}
-  ) {
+  constructor(publicKey, productData) {
     this.#publicKey = publicKey;
-    this.name = name;
-    this.description = description;
-    this.price = price;
-    this.lockPeriod = lockPeriod;
+    if (!productData) {
+      this.name = "";
+      this.description = "";
+      this.price = 0;
+      this.lockPeriod = 0;
+    } else {
+      this.name = String.fromCharCode.apply(null, productData.name).trim();
+      this.price = productData.price;
+      this.lockPeriod = productData.lockPeriod;
+      this.seller = productData.seller;
+      this.buyer = productData.buyer;
+      this.stage = productData.stage;
+    }
   }
   get publicKey() {
     return this.#publicKey ? this.#publicKey.toBase58() : null;

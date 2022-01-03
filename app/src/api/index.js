@@ -1,1 +1,2 @@
-export * from "./creaet-product";
+export * from "./create-product";
+export * from "./get-products";
