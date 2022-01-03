@@ -47,6 +47,8 @@
 </template>
 <script setup>
 import { computed, reactive, toRefs } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 import { Product } from "@/models";
 import { createProduct } from "@/api";
 import {
@@ -54,10 +56,14 @@ import {
   useCountCharacterLimit,
   useFormInput,
 } from "@/composables";
+import { mintAddress } from "@/dummy-data";
+
+const workspace = useWorkspace();
+const router = useRouter();
+const store = useStore();
 
 const product = reactive(new Product());
 const { name, price } = toRefs(product);
-const workspace = useWorkspace();
 const charLimit = useCountCharacterLimit(name, 20);
 
 const [nameError, nameClass] = useFormInput(
@@ -71,11 +77,9 @@ const charLimitClass = computed(() => {
 });
 
 async function submit() {
-  await createProduct(
-    workspace,
-    product,
-    "34bovXMT6ApCU9bMmaUtvDZFNbcgFDdphRNjrcdtaPtt"
-  );
+  await createProduct(workspace, product, mintAddress);
+  await store.dispatch("products/refresh", workspace);
+  router.push("/");
 }
 </script>
 <style scoped>

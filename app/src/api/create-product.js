@@ -40,5 +40,4 @@ export const createProduct = async (
       preInstructions: transactions,
     }
   );
-  console.log("done");
 };

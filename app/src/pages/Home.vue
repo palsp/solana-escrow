@@ -9,11 +9,8 @@
 </template>
 <script setup>
 import { useStore } from "vuex";
-import { getProducts } from "@/api";
-import { useWorkspace } from "@/composables";
 import { computed } from "@vue/reactivity";
 
-const workspace = useWorkspace();
 const store = useStore();
 const products = computed(() => store.getters["products/products"]);
 </script>

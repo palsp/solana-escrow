@@ -39,7 +39,6 @@ export const getTokenAccounts = async ({ connection, wallet }) => {
         balance,
       };
     }
-    console.log(13);
     // const solBalance = await connection.getBalance(
     //   wallet.value.publicKey,
     //   "confirmed"

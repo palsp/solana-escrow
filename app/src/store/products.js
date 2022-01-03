@@ -31,8 +31,13 @@ export default {
       const myProducts = await getProducts(workspace, [
         sellerFilter(workspace.wallet.value.publicKey.toBase58()),
       ]);
-      console.log("getMyProducts", myProducts);
       commit("setMyProducts", myProducts);
+    },
+    async refresh({ dispatch }, workspace) {
+      await Promise.all([
+        dispatch("getProducts", workspace),
+        dispatch("getMyProducts", workspace),
+      ]);
     },
   },
 };
