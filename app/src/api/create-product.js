@@ -1,11 +1,6 @@
 import { web3, BN } from "@project-serum/anchor";
 import { getTokenAccounts, createAssociateTokenAccount } from "@/utils";
 import { PublicKey } from "@solana/web3.js";
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
 
 export const createProduct = async (
   { wallet, program, connection },
@@ -20,32 +15,13 @@ export const createProduct = async (
   const tokenAccounts = await getTokenAccounts({ connection, wallet });
 
   let tokenAccount = tokenAccounts[mintAddress];
-  let transactions = [];
-  let tx = new web3.Transaction();
+  const transactions = [];
   if (!tokenAccount) {
-    const _tokenAccount = await Token.getAssociatedTokenAddress(
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      new PublicKey(mintAddress),
-      wallet.value.publicKey
+    tokenAccount = await createAssociateTokenAccount(
+      { wallet },
+      mintAddress,
+      transactions
     );
-    const createTokenAccountIX = Token.createAssociatedTokenAccountInstruction(
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      new PublicKey(mintAddress),
-      _tokenAccount,
-      wallet.value.publicKey,
-      wallet.value.publicKey
-    );
-
-    tokenAccount = {
-      tokenAccountAddress: _tokenAccount.toBase58(),
-    };
-
-    // const tx = new web3.Transaction();
-    tx.add(createTokenAccountIX);
-    // await provider.value.send(tx);
-    transactions.push(tx);
   }
 
   await program.value.rpc.initializeProduct(
