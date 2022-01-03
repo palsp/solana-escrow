@@ -4,6 +4,8 @@ import idl from "@/idl/halffin.json";
 import { Provider, Program } from "@project-serum/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
 
+import store from "@/store";
+
 // const clusterUrl = process.env.VUE_APP_CLUSTER_URL;
 const clusterUrl = "http://127.0.0.1:8899";
 const preflightCommitment = "processed";
@@ -27,6 +29,10 @@ export const initWorkspace = () => {
   );
 
   const program = computed(() => new Program(idl, programID, provider.value));
+
+  store.dispatch("products/getProducts", {
+    program,
+  });
   provide(workspaceSymbol, {
     wallet,
     connection,

@@ -20,6 +20,7 @@ import {
 import ConnectWallet from "@/components/ConnectWallet.vue";
 import { WalletProvider } from "@solana/wallet-adapter-vue";
 import WorkspaceProvider from "@/components/provider/WorkspaceProvider";
+
 export default {
   components: { ConnectWallet, WalletProvider, WorkspaceProvider },
   setup() {

@@ -152,6 +152,14 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "seller",
+            "type": "publicKey"
+          },
+          {
+            "name": "buyer",
+            "type": "publicKey"
+          },
+          {
             "name": "name",
             "type": {
               "array": [
@@ -172,14 +180,6 @@
                 10
               ]
             }
-          },
-          {
-            "name": "seller",
-            "type": "publicKey"
-          },
-          {
-            "name": "buyer",
-            "type": "publicKey"
           },
           {
             "name": "mintPubkey",
@@ -252,6 +252,11 @@
       "code": 6002,
       "name": "InsufficientFund",
       "msg": "insufficient fund"
+    },
+    {
+      "code": 6003,
+      "name": "EmptyName",
+      "msg": "name must not be empty"
     }
   ],
   "metadata": {

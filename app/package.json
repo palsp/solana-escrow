@@ -48,7 +48,8 @@
     },
     "rules": {
       "vue/no-multiple-template-root" : 0,
-      "no-unused-vars" : "warn"
+      "no-unused-vars" : "warn",
+      "no-undef" : "warn"
     }
   },
   "browserslist": [

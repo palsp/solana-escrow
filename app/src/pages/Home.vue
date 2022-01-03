@@ -1,14 +1,26 @@
 <template>
-  <div></div>
+  <section class="product-section">
+    <product-card
+      v-for="product in products"
+      :key="product.name"
+      :product="product"
+    />
+  </section>
 </template>
-<script>
+<script setup>
+import { useStore } from "vuex";
 import { getProducts } from "@/api";
 import { useWorkspace } from "@/composables";
-export default {
-  setup() {
-    const workspace = useWorkspace();
-    getProducts(workspace);
-  },
-};
+import { computed } from "@vue/reactivity";
+
+const workspace = useWorkspace();
+const store = useStore();
+const products = computed(() => store.getters["products/products"]);
 </script>
-<style lang=""></style>
+<style scoped>
+.product-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  text-align: center;
+}
+</style>

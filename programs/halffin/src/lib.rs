@@ -17,6 +17,9 @@ pub mod halffin {
         lock_period: u64,
     ) -> ProgramResult {
         msg!("INITIALIZE PRODUCT");
+        if name.len() <= 0 {
+            return Err(ErrorCode::EmptyName.into())
+        }
         let product_account = &mut ctx.accounts.product_account;
         let name_bytes = name.as_bytes();
         let mut name_data = [b' '; 20];
@@ -246,6 +249,8 @@ pub enum ErrorCode {
     InvalidStage,
     #[msg("insufficient fund")]
     InsufficientFund,
+    #[msg("name must not be empty")]
+    EmptyName,
 }
 
 

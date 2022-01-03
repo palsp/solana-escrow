@@ -74,7 +74,7 @@ async function submit() {
   await createProduct(
     workspace,
     product,
-    "H6B3KvXqccrknUgb9Zfs6fRbcjJq1JYTSvZ6ndXwWUnQ"
+    "34bovXMT6ApCU9bMmaUtvDZFNbcgFDdphRNjrcdtaPtt"
   );
 }
 </script>

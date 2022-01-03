@@ -5,6 +5,7 @@ export const getProducts = async ({ program }, filters = []) => {
   const products = _products.map(
     (product) => new Product(product.publicKey, product.account)
   );
+  console.log(products);
   return products;
 };
 
