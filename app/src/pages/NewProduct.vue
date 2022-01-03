@@ -7,7 +7,13 @@
 
     <div class="form-group">
       <label for="name">Name: </label>
-      <input id="name" type="text" v-model="product.name" />
+      <input :class="nameClass" id="name" type="text" v-model="product.name" />
+      <p :class="charLimitClass">{{ charLimit }}</p>
+    </div>
+    <div>
+      <p class="error-text" v-if="nameError">
+        name must have at least 1 and not more than 20 characters
+      </p>
     </div>
 
     <div class="form-group">
@@ -22,8 +28,14 @@
 
     <div class="form-group">
       <label for="price">Price: </label>
-      <input id="price" type="number" v-model="product.price" />
+      <input
+        :class="priceClass"
+        id="price"
+        type="number"
+        v-model="product.price"
+      />
     </div>
+    <p class="error-text" v-if="priceError">price must be greater than 0</p>
 
     <div class="form-group">
       <label for="lockPeriod">Lock Period: </label>
@@ -34,14 +46,29 @@
   </form>
 </template>
 <script setup>
-import { reactive } from "vue";
+import { computed, reactive, toRefs } from "vue";
 import { Product } from "@/models";
 import { createProduct } from "@/api";
-import { useWorkspace } from "@/composables";
+import {
+  useWorkspace,
+  useCountCharacterLimit,
+  useFormInput,
+} from "@/composables";
 
 const product = reactive(new Product());
+const { name, price } = toRefs(product);
 const workspace = useWorkspace();
-console.log(workspace);
+const charLimit = useCountCharacterLimit(name, 20);
+
+const [nameError, nameClass] = useFormInput(
+  name,
+  (_name) => _name.length <= 20 && _name.length > 0
+);
+const [priceError, priceClass] = useFormInput(price, (_price) => _price > 0);
+
+const charLimitClass = computed(() => {
+  return nameError.value ? "char-limit error-text" : "char-limit";
+});
 
 async function submit() {
   await createProduct(
@@ -59,6 +86,20 @@ async function submit() {
   align-items: center;
 }
 
+.error {
+  border: 1px solid red;
+}
+
+.error-text {
+  color: red;
+}
+
+.char-limit {
+  position: absolute;
+  bottom: -33px;
+  right: 20px;
+}
+
 .btn {
   margin-top: 2rem;
   padding: 0.5rem;
@@ -67,8 +108,10 @@ async function submit() {
 .form-group {
   display: flex;
   justify-content: space-between;
+  position: relative;
   padding: 1rem;
   text-align: left;
+  margin: 1rem;
   width: 50%;
 }
 
