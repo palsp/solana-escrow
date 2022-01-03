@@ -2,6 +2,13 @@
   <div></div>
 </template>
 <script>
-export default {};
+import { getProducts } from "@/api";
+import { useWorkspace } from "@/composables";
+export default {
+  setup() {
+    const workspace = useWorkspace();
+    getProducts(workspace);
+  },
+};
 </script>
 <style lang=""></style>
