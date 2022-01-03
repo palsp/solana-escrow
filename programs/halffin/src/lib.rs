@@ -207,11 +207,11 @@ pub struct WithdrawFund<'info> {
 #[account]
 #[derive(Default)]
 pub struct Product {
+    seller: Pubkey,
+    buyer: Pubkey,
     name: [u8; 20],
     bump : u8,
     tracking_id : [u8; 10],
-    seller: Pubkey,
-    buyer: Pubkey,
     mint_pubkey: Pubkey,
     lock_period: u64,
     stage: Stage,
