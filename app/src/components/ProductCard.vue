@@ -1,17 +1,18 @@
 <template>
-  <div class="card">
-    <h2>
-      {{ product.name }}
-    </h2>
-    <!-- <p>Owner : {{ owner }}</p> -->
-    <p>
-      Price : {{ product.price }}
-      {{ symbol }}
-    </p>
-    <!-- <p>Locktime : {{ lockTime }}</p> -->
-    <!-- <p>Stage : {{ product.stage }}</p> -->
-    <p v-if="!!product.trackingId">Tracking ID : {{ product.trackingId }}</p>
-  </div>
+  <router-link :to="`/product/${product.publicKeyBase58}`">
+    <div class="card">
+      <h2>
+        {{ product.name }}
+      </h2>
+      <!-- <p>Owner : {{ owner }}</p> -->
+      <p>
+        Price : {{ product.priceEther }}
+        {{ product.tokenSymbol }}
+      </p>
+      <!-- <p>Locktime : {{ lockTime }}</p> -->
+      <p v-if="!!product.trackingId">Tracking ID : {{ product.trackingId }}</p>
+    </div>
+  </router-link>
 </template>
 <script setup>
 import { toRefs, computed } from "vue";
@@ -23,10 +24,6 @@ const props = defineProps({
 });
 
 const { product } = toRefs(props);
-const symbol = computed(() => {
-  const token = getTokenSymbolByMintAddress(product.value.mint);
-  return token ? token.symbol : null;
-});
 </script>
 <style scoped>
 .card {

@@ -1,7 +1,8 @@
+import { getTokenSymbolByMintAddress } from "@/utils";
+
 export class Product {
-  #publicKey;
   constructor(publicKey, productData) {
-    this.#publicKey = publicKey;
+    this.publicKey = publicKey;
     if (!productData) {
       this.name = "";
       this.description = "";
@@ -13,11 +14,14 @@ export class Product {
       this.lockPeriod = productData.lockPeriod;
       this.seller = productData.seller;
       this.buyer = productData.buyer;
-      this.stage = productData.stage;
+      this.stage = Object.keys(productData.stage)[0];
       this.mint = productData.mintPubkey.toBase58();
+      const token = getTokenSymbolByMintAddress(this.mint);
+      this.priceEther = this.price / (1 * 10 ** token.decimals);
+      this.tokenSymbol = token.symbol;
     }
   }
-  get publicKey() {
-    return this.#publicKey ? this.#publicKey.toBase58() : null;
+  get publicKeyBase58() {
+    return this.publicKey ? this.publicKey.toBase58() : null;
   }
 }

@@ -38,11 +38,11 @@
         <select name="currency" id="currency" v-model="currencyAddress">
           <option
             class="form-option"
-            v-for="symbol in Object.keys(TOKENS_SYMBOL)"
-            :key="symbol"
-            :value="TOKENS_SYMBOL[symbol].mintAddress"
+            v-for="token in Object.keys(TOKENS_SYMBOL)"
+            :key="token"
+            :value="TOKENS_SYMBOL[token].mintAddress"
           >
-            {{ symbol }}
+            {{ TOKENS_SYMBOL[token].symbol }}
           </option>
         </select>
       </div>

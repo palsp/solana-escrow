@@ -1,17 +1,23 @@
-import { web3, BN } from "@project-serum/anchor";
+import { web3, BN, Provider } from "@project-serum/anchor";
 import { getTokenAccounts, createAssociateTokenAccount } from "@/utils";
 import { PublicKey } from "@solana/web3.js";
+import { NATIVE_SOL, getTokenSymbolByMintAddress } from "@/utils/tokens";
+import { findProductAccountAddress } from ".";
 
 export const createProduct = async (
   { wallet, program, connection },
   productData,
   mintAddress
 ) => {
-  const [productAccount, productAccountBump] =
-    await web3.PublicKey.findProgramAddress(
-      [wallet.value.publicKey.toBuffer(), Buffer.from(productData.name)],
-      program.value.programId
-    );
+  if (mintAddress === NATIVE_SOL.mintAddress) {
+    await createProductOfSol({ wallet, program }, productData);
+    return;
+  }
+  const [productAccount, productAccountBump] = await findProductAccountAddress(
+    wallet.value.publicKey,
+    productData.name,
+    program.value.programId
+  );
   const tokenAccounts = await getTokenAccounts({ connection, wallet });
 
   let tokenAccount = tokenAccounts[mintAddress];
@@ -24,10 +30,13 @@ export const createProduct = async (
     );
   }
 
+  const token = getTokenSymbolByMintAddress(mintAddress);
+  const price = new BN(+productData.price * 1 * 10 ** token.decimals);
+
   await program.value.rpc.initializeProduct(
     productData.name,
     productAccountBump,
-    new BN(productData.price),
+    price,
     new BN(productData.lockPeriod),
     {
       accounts: {
@@ -38,6 +47,28 @@ export const createProduct = async (
         rent: web3.SYSVAR_RENT_PUBKEY,
       },
       preInstructions: transactions,
+    }
+  );
+};
+
+export const createProductOfSol = async ({ wallet, program }, productData) => {
+  const [productAccount, productAccountBump] = await findProductAccountAddress(
+    wallet.value.publicKey,
+    productData.name,
+    program.value.programId
+  );
+
+  await program.value.rpc.initializeProductSol(
+    productData.name,
+    productAccountBump,
+    new BN(+productData.price * 1 * 10 ** NATIVE_SOL.decimals),
+    new BN(productData.lockPeriod),
+    {
+      accounts: {
+        authority: wallet.value.publicKey,
+        productAccount,
+        systemProgram: web3.SystemProgram.programId,
+      },
     }
   );
 };

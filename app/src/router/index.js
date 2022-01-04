@@ -19,6 +19,11 @@ const routes = [
     component: require("@/pages/Profile.vue").default,
     meta: { requireConnected: true },
   },
+  {
+    path: "/product/:pubkey",
+    name: "Product",
+    component: require("@/pages/Product.vue").default,
+  },
 ];
 
 const router = createRouter({

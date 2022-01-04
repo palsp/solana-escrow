@@ -1,3 +1,4 @@
+import { PublicKey } from "@solana/web3.js";
 import { Product } from "../models";
 
 export const getProducts = async ({ program }, filters = []) => {
@@ -5,7 +6,6 @@ export const getProducts = async ({ program }, filters = []) => {
   const products = _products.map(
     (product) => new Product(product.publicKey, product.account)
   );
-
   return products;
 };
 
@@ -24,3 +24,10 @@ export const buyerFilter = (buyerBase58Pubkey) => ({
     bytes: buyerBase58Pubkey,
   },
 });
+
+export const getProductByID = async ({ program }, productPubkeyBase58) => {
+  const productPubkey = new PublicKey(productPubkeyBase58);
+
+  const product = await program.value.account.product.fetch(productPubkey);
+  return new Product(productPubkey, product);
+};
