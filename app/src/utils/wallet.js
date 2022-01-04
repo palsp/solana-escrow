@@ -1,6 +1,20 @@
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
 import { lt, TokenAmount } from "@/models";
 import { NATIVE_SOL } from "./tokens";
+import { PublicKey } from "@solana/web3.js";
+
+export const findAssociateTokenAddress = (wallet, tokenMintAddress) => {
+  return Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    new PublicKey(tokenMintAddress),
+    wallet.value.publicKey
+  );
+};
 
 export const getTokenAccounts = async ({ connection, wallet }) => {
   const parsedTokenAccount = await connection.getParsedTokenAccountsByOwner(
@@ -11,36 +25,26 @@ export const getTokenAccounts = async ({ connection, wallet }) => {
     "confirmed"
   );
   const tokenAccounts = {};
-  parsedTokenAccount.value.forEach((tokenAccountInfo) => {
+  for (const tokenAccountInfo of parsedTokenAccount.value) {
+    const tokenAccountPubKey = tokenAccountInfo.pubkey;
     const tokenAccountAddress = tokenAccountInfo.pubkey.toBase58();
-
     const parsedInfo = tokenAccountInfo.account.data.parsed.info;
-
     const mintAddress = parsedInfo.mint;
-
     const balance = new TokenAmount(
       parsedInfo.tokenAmount.amount,
       parsedInfo.tokenAmount.decimals
     );
-    if (Object.prototype.hasOwnProperty.call(tokenAccounts, mintAddress)) {
-      if (
-        lt(
-          tokenAccounts[mintAddress].balance.wei.toNumber(),
-          balance.wei.toNumber()
-        )
-      ) {
-        tokenAccounts[mintAddress] = {
-          tokenAccountAddress,
-          balance,
-        };
-      }
-    } else {
+
+    const ata = await findAssociateTokenAddress(wallet, mintAddress);
+
+    if (ata.equals(tokenAccountPubKey)) {
       tokenAccounts[mintAddress] = {
         tokenAccountAddress,
         balance,
       };
     }
-  });
+  }
+
   const solBalance = await connection.getBalance(
     wallet.value.publicKey,
     "confirmed"

@@ -9,6 +9,9 @@ declare_id!("28Y6Ezy4za168iKHsWb1iUih7pDw1NzBWFJ4Kya8FmQb");
 pub mod halffin {
     use super::*;
 
+    const VAULT_PDA_SEED: &[u8] = b"escrow_vault";
+
+
     pub fn initialize_product(
         ctx: Context<Initialize>,
         name: String,
@@ -36,6 +39,28 @@ pub mod halffin {
         Ok(())
     }
 
+    pub fn initialize_product_sol(
+        ctx: Context<InitializeNativeSOL>,
+        name: String, 
+        bump: u8,
+        price: u64,
+        lock_period: u64,
+    ) -> ProgramResult {
+        msg!("INITIALIZE NATIVE SOL");
+        let product_account = &mut ctx.accounts.product_account;
+        let name_bytes = name.as_bytes();
+        let mut name_data = [b' '; 20];
+        name_data[..name_bytes.len()].copy_from_slice(name_bytes);
+
+        product_account.name = name_data;
+        product_account.bump = bump;
+        product_account.price = price;
+        product_account.lock_period = lock_period;
+        product_account.seller = *ctx.accounts.authority.to_account_info().key;
+        
+        Ok(())
+    }
+
     pub fn create_order(ctx: Context<CreateOrder>) -> ProgramResult {
         msg!("CREATE ORDER");
         let clock: Clock = Clock::get().unwrap();
@@ -46,6 +71,34 @@ pub mod halffin {
         ctx.accounts.product_account.temp_token_account_pubkey = ctx.accounts.temp_token_account.key();
 
         token::set_authority(ctx.accounts.into(), AuthorityType::AccountOwner, Some(ctx.accounts.product_account.key()))?;
+        Ok(())
+    }
+
+    pub fn create_order_sol(ctx: Context<CreateOrderSOL>) -> ProgramResult {
+        msg!("CREATE ORDER SOL");
+        let clock: Clock = Clock::get().unwrap();
+
+        ctx.accounts.product_account.buyer = *ctx.accounts.buyer.to_account_info().key;
+        ctx.accounts.product_account.stage = Stage::WaitForShipping;
+        ctx.accounts.product_account.timestamp = clock.unix_timestamp;
+
+        let (pda, _bump_seed) = Pubkey::find_program_address(&[VAULT_PDA_SEED], ctx.program_id);
+
+        let ix = anchor_lang::solana_program::system_instruction::transfer(
+            &ctx.accounts.buyer.key(), 
+            &pda, 
+            ctx.accounts.product_account.price);
+
+        anchor_lang::solana_program::program::invoke(
+            &ix, 
+            &[
+                ctx.accounts.buyer.to_account_info(),
+                ctx.accounts.pda_account.clone(),
+                ctx.accounts.system_program.to_account_info(),
+            ])?;
+
+        msg!("PROGRAM HAS {} lamports",ctx.accounts.pda_account.lamports());
+
         Ok(())
     }
 
@@ -94,7 +147,39 @@ pub mod halffin {
         
         Ok(())
     }
+
+    pub fn withdraw_sol(ctx : Context<WithdrawSol>) -> ProgramResult {
+        msg!("WITHDRAW FUND");
+        msg!("PDA ACCOUNT HAS {} lamports" , ctx.accounts.pda_account.lamports());
+
+        let (_pda , bump_seed) = Pubkey::find_program_address(&[VAULT_PDA_SEED], ctx.program_id);
+        let seeds = [&VAULT_PDA_SEED[..], &[bump_seed]];
+
+        let signer = &[&seeds[..]];
+
+
+        let ix = anchor_lang::solana_program::system_instruction::transfer(
+            &ctx.accounts.pda_account.key(), 
+            &ctx.accounts.authority.key(), 
+            ctx.accounts.product_account.price);
+
+        anchor_lang::solana_program::program::invoke_signed(
+            &ix, 
+            &[
+                ctx.accounts.pda_account.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+            ],
+            signer
+        )?;
+
+       
+        Ok(())
+    }
+
 }
+
+
 
 /**
  * NOTE: order of parameters of instruction matter!!!!!!
@@ -123,6 +208,24 @@ pub struct Initialize<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(name: String, bump : u8)]
+pub struct InitializeNativeSOL<'info> {
+    pub authority: Signer<'info>,
+
+    #[account(
+        init, 
+        seeds = [
+            authority.key().as_ref(),
+            name.as_bytes()],
+        bump = bump,
+        payer = authority,
+    )]
+    pub product_account: Box<Account<'info, Product>>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 pub struct CreateOrder<'info> {
     buyer: Signer<'info>,
 
@@ -143,6 +246,26 @@ pub struct CreateOrder<'info> {
     token_program : Program<'info, Token>,
 }
 
+
+#[derive(Accounts)]
+pub struct CreateOrderSOL<'info>{
+    #[account(mut)]
+    buyer: Signer<'info>,
+
+    #[account(
+        mut, 
+        constraint = product_account.stage == Stage::Initiate @ ErrorCode::InvalidStage , 
+        constraint = buyer.key() != product_account.seller)]
+    product_account: Account<'info, Product>,
+    
+    #[account(mut)]
+    pda_account: AccountInfo<'info>,
+
+
+    system_program : Program<'info, System>,
+}
+
+
 impl<'info> From<&mut CreateOrder<'info>> for CpiContext<'_, '_, '_, 'info, SetAuthority<'info>> {
     fn from(accounts: &mut CreateOrder<'info>) -> Self {
       let cpi_accounts = SetAuthority {
@@ -153,6 +276,7 @@ impl<'info> From<&mut CreateOrder<'info>> for CpiContext<'_, '_, '_, 'info, SetA
       CpiContext::new(cpi_program, cpi_accounts)
     }
   }
+
 
 #[derive(Accounts)] 
 pub struct UpdateShippingDetail<'info> {
@@ -203,6 +327,26 @@ pub struct WithdrawFund<'info> {
 
 }
 
+#[derive(Accounts)]
+pub struct WithdrawSol<'info> {
+    #[account(mut)]
+    authority: Signer<'info>,
+
+    #[account(
+        mut, 
+        constraint = product_account.seller == authority.key(),
+        constraint = product_account.stage == Stage::Delivered @ ErrorCode::InvalidStage,
+        close = authority,
+    )]
+    product_account : Account<'info, Product>,
+
+
+    #[account(mut)]
+    pda_account: AccountInfo<'info>,
+
+    system_program : Program<'info, System>,
+
+}
 
 
 // impl<'info>

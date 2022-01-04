@@ -23,11 +23,11 @@ describe("halffin", () => {
   let buyerTokenAccount: anchor.web3.PublicKey;
 
   const buyer = Keypair.generate();
-
+  console.log("buyer: ", buyer.publicKey.toBase58());
   const payer = Keypair.generate();
   const mintAuthority = Keypair.generate();
 
-  const productPrice = new anchor.BN(1000);
+  const productPrice = new anchor.BN(1 * 10 ** 9);
 
   it("Is initialize escrow state", async () => {
     await provider.connection.confirmTransaction(
@@ -62,7 +62,7 @@ describe("halffin", () => {
     assert.ok(_sellerTokenAccount.amount.toNumber() == 0);
   });
 
-  const productName = faker.commerce.productName().slice(0, 20);
+  let productName = faker.commerce.productName().slice(0, 20);
   const nowBn = new anchor.BN(Date.now() / 1000);
   const lockPeriod = nowBn.add(new anchor.BN(5));
 
@@ -90,7 +90,6 @@ describe("halffin", () => {
     );
 
     const _productAccount = await program.account.product.fetch(productAccount);
-    // console.log(_productAccount.name);
     const _name = String.fromCharCode.apply(null, _productAccount.name);
     assert.equal(_name.trim(), productName);
     assert.equal(_productAccount.bump, productAccountBump);
@@ -173,5 +172,121 @@ describe("halffin", () => {
     assert.ok(_sellerTokenAccount.amount.eq(productPrice));
     const _buyerTokenAccount = await mint.getAccountInfo(buyerTokenAccount);
     assert.ok(_buyerTokenAccount.amount.toNumber() == 0);
+  });
+
+  describe("native sol", () => {
+    productName = faker.commerce.productName().slice(0, 20);
+    it("initialize product account with native sol", async () => {
+      const [productAccount, productAccountBump] =
+        await anchor.web3.PublicKey.findProgramAddress(
+          [provider.wallet.publicKey.toBuffer(), , Buffer.from(productName)],
+          program.programId
+        );
+
+      await program.rpc.initializeProductSol(
+        productName,
+        productAccountBump,
+        productPrice,
+        lockPeriod,
+        {
+          accounts: {
+            authority: provider.wallet.publicKey,
+            productAccount,
+            systemProgram: anchor.web3.SystemProgram.programId,
+          },
+        }
+      );
+    });
+
+    let buyerBalance = 10000000000;
+    it("create order with native sol", async () => {
+      const [productAccount] = await anchor.web3.PublicKey.findProgramAddress(
+        [provider.wallet.publicKey.toBuffer(), , Buffer.from(productName)],
+        program.programId
+      );
+
+      const [pdaAccount] = await anchor.web3.PublicKey.findProgramAddress(
+        [Buffer.from("escrow_vault")],
+        program.programId
+      );
+
+      console.log("create order with native sol: ", pdaAccount.toBase58());
+
+      const tx = await provider.connection.requestAirdrop(
+        buyer.publicKey,
+        buyerBalance
+      );
+      await provider.connection.confirmTransaction(tx, "confirmed");
+
+      let _buyerAccountInfo = await provider.connection.getAccountInfo(
+        buyer.publicKey
+      );
+      assert.equal(_buyerAccountInfo.lamports, buyerBalance);
+
+      await program.rpc.createOrderSol({
+        accounts: {
+          buyer: buyer.publicKey,
+          productAccount,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          pdaAccount,
+        },
+        signers: [buyer],
+      });
+
+      _buyerAccountInfo = await provider.connection.getAccountInfo(
+        buyer.publicKey
+      );
+
+      assert.equal(
+        _buyerAccountInfo.lamports,
+        buyerBalance - productPrice.toNumber()
+      );
+    });
+
+    it("withdraw sol", async () => {
+      // update shipping detail
+      const [productAccount] = await anchor.web3.PublicKey.findProgramAddress(
+        [provider.wallet.publicKey.toBuffer(), , Buffer.from(productName)],
+        program.programId
+      );
+      await program.rpc.updateShippingDetail(trackingID, {
+        accounts: {
+          authority: provider.wallet.publicKey,
+          productAccount,
+        },
+      });
+
+      const _productAccount = await program.account.product.fetch(
+        productAccount
+      );
+      const _trackingID = String.fromCharCode.apply(
+        null,
+        _productAccount.trackingId
+      );
+      assert.equal(trackingID, _trackingID.trim());
+
+      await program.rpc.fulfillShippingDetail({
+        accounts: {
+          authority: provider.wallet.publicKey,
+          productAccount,
+        },
+      });
+
+      // withdraw fund
+
+      const [pdaAccount] = await anchor.web3.PublicKey.findProgramAddress(
+        [Buffer.from("escrow_vault")],
+        program.programId
+      );
+
+      await program.rpc.withdrawSol({
+        accounts: {
+          authority: provider.wallet.publicKey,
+          productAccount,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          pdaAccount,
+        },
+      });
+    });
   });
 });

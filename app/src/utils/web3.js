@@ -5,6 +5,7 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
+import { findAssociateTokenAddress } from ".";
 
 export const createAssociateTokenAccount = async (
   { wallet },
@@ -12,11 +13,9 @@ export const createAssociateTokenAccount = async (
   transactions
 ) => {
   const tx = new web3.Transaction();
-  const tokenAccountAddress = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-    new PublicKey(mintAddress),
-    wallet.value.publicKey
+  const tokenAccountAddress = await findAssociateTokenAddress(
+    wallet,
+    mintAddress
   );
 
   const createATAIX = Token.createAssociatedTokenAccountInstruction(
