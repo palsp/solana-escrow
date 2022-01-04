@@ -1,5 +1,6 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { lt, TokenAmount } from "@/models";
+import { NATIVE_SOL } from "./tokens";
 
 export const getTokenAccounts = async ({ connection, wallet }) => {
   const parsedTokenAccount = await connection.getParsedTokenAccountsByOwner(
@@ -39,17 +40,15 @@ export const getTokenAccounts = async ({ connection, wallet }) => {
         balance,
       };
     }
-    // const solBalance = await connection.getBalance(
-    //   wallet.value.publicKey,
-    //   "confirmed"
-    // );
-    // tokenAccounts[NATIVE_SOL.mintAddress] = {
-    //   tokenAccountAddress: wallet.publicKey.toBase58(),
-    //   balance: new TokenAmount(solBalance, NATIVE_SOL.decimals),
-    // };
-
-    return tokenAccounts;
   });
+  const solBalance = await connection.getBalance(
+    wallet.value.publicKey,
+    "confirmed"
+  );
+  tokenAccounts[NATIVE_SOL.mintAddress] = {
+    tokenAccountAddress: wallet.value.publicKey.toBase58(),
+    balance: new TokenAmount(solBalance, NATIVE_SOL.decimals),
+  };
 
   return tokenAccounts;
 };

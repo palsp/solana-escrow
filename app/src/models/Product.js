@@ -14,6 +14,7 @@ export class Product {
       this.seller = productData.seller;
       this.buyer = productData.buyer;
       this.stage = productData.stage;
+      this.mint = productData.mintPubkey.toBase58();
     }
   }
   get publicKey() {

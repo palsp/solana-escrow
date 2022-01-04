@@ -26,14 +26,26 @@
       ></textarea>
     </div>
 
-    <div class="form-group">
+    <div class="form-group price">
       <label for="price">Price: </label>
-      <input
-        :class="priceClass"
-        id="price"
-        type="number"
-        v-model="product.price"
-      />
+      <div class="form-control">
+        <input
+          :class="priceClass"
+          id="price"
+          type="number"
+          v-model="product.price"
+        />
+        <select name="currency" id="currency" v-model="currencyAddress">
+          <option
+            class="form-option"
+            v-for="symbol in Object.keys(TOKENS_SYMBOL)"
+            :key="symbol"
+            :value="TOKENS_SYMBOL[symbol].mintAddress"
+          >
+            {{ symbol }}
+          </option>
+        </select>
+      </div>
     </div>
     <p class="error-text" v-if="priceError">price must be greater than 0</p>
 
@@ -46,7 +58,7 @@
   </form>
 </template>
 <script setup>
-import { computed, reactive, toRefs } from "vue";
+import { computed, reactive, ref, toRefs } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { Product } from "@/models";
@@ -56,11 +68,13 @@ import {
   useCountCharacterLimit,
   useFormInput,
 } from "@/composables";
-import { mintAddress } from "@/dummy-data";
+import { TOKENS_SYMBOL, NATIVE_SOL } from "@/utils";
 
 const workspace = useWorkspace();
 const router = useRouter();
 const store = useStore();
+// Default currency to native sol
+const currencyAddress = ref(NATIVE_SOL.mintAddress);
 
 const product = reactive(new Product());
 const { name, price } = toRefs(product);
@@ -77,7 +91,7 @@ const charLimitClass = computed(() => {
 });
 
 async function submit() {
-  await createProduct(workspace, product, mintAddress);
+  await createProduct(workspace, product, currencyAddress.value);
   await store.dispatch("products/refresh", workspace);
   router.push("/");
 }
@@ -123,6 +137,23 @@ async function submit() {
 .form-group textarea {
   width: 70%;
   padding: 1rem;
+}
+
+.form-control {
+  width: 70%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#price {
+  width: 100%;
+}
+
+#currency {
+  width: 100%;
+  margin-left: 1rem;
 }
 
 /* Chrome, Safari, Edge, Opera */

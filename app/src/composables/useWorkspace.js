@@ -15,7 +15,6 @@ const workspaceSymbol = Symbol("Workspace");
 export const useWorkspace = () => inject(workspaceSymbol);
 
 export const initWorkspace = () => {
-  console.log("init workspace");
   const wallet = useAnchorWallet();
   const connection = new Connection(clusterUrl, commitment);
   const provider = computed(

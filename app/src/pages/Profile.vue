@@ -1,5 +1,6 @@
 <template>
   <div>
+    <section class="token-section"></section>
     <section class="option-section">
       <p>My Product</p>
       <p>My Purchase</p>
@@ -22,7 +23,6 @@ const store = useStore();
 const workspace = useWorkspace();
 
 const myProducts = computed(() => store.getters["products/myProducts"]);
-
 watchEffect(() => {
   store.dispatch("products/getMyProducts", workspace);
 });

@@ -20,7 +20,7 @@
 
 <script>
 import ConnectWallet from "@/components/ConnectWallet.vue";
-import { watchEffect } from "vue";
+import { watch, watchEffect } from "vue";
 import { useStore } from "vuex";
 import { useWorkspace } from "@/composables";
 import { useWallet } from "@solana/wallet-adapter-vue";
@@ -38,6 +38,10 @@ export default {
 
     watchEffect(() => {
       store.dispatch("wallet/setConnected", connected.value);
+    });
+
+    watch(connected, (newVal) => {
+      if (newVal) store.dispatch("wallet/getTokenAccounts", workspace);
     });
 
     return {

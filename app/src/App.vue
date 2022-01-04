@@ -1,7 +1,7 @@
 <template>
   <wallet-provider :wallets="wallets">
     <workspace-provider>
-      <layout />
+      <Main />
     </workspace-provider>
   </wallet-provider>
 </template>
@@ -14,13 +14,13 @@ import {
 
 import { WalletProvider } from "@solana/wallet-adapter-vue";
 import WorkspaceProvider from "@/components/provider/WorkspaceProvider";
-import Layout from "@/layouts/Layout.vue";
+import Main from "@/layouts/Main.vue";
 
 export default {
   components: {
     WalletProvider,
     WorkspaceProvider,
-    Layout,
+    Main,
   },
   setup() {
     const wallets = [getPhantomWallet(), getSolflareWallet()];
