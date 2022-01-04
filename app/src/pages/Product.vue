@@ -10,22 +10,39 @@
     </p>
     <!-- <p>Locktime : {{ lockTime }}</p> -->
     <p>Stage : {{ product.stage }}</p>
-
-    <button v-if="showBuy" @click="order">BUY</button>
+    <section v-if="showBuy" class="order-section">
+      <button @click="order">BUY</button>
+    </section>
+    <section class="update-shipment-section">
+      <div class="form-group" v-if="showUpdateShippingDetail">
+        <label for="trackingID">TRACKING ID : </label>
+        <input
+          type="text"
+          placeholder="tracking id......"
+          v-model="trackingID"
+        />
+        <button @click="updateTracking">UPDATE TRACKING</button>
+      </div>
+    </section>
+    <section v-if="showWithdraw" class="withdraw-section">
+      <button @click="withdraw">Withdraw Fund</button>
+    </section>
   </div>
 </template>
 <script setup>
 import { ref, watchEffect, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { getProductByID } from "@/api";
 import { useWorkspace } from "@/composables";
 import { Product } from "@/models";
-import { createOrder } from "@/api";
+import { createOrder, updateShippingDetail, withdrawFund } from "@/api";
 
 const route = useRoute();
+const router = useRouter();
 const workspace = useWorkspace();
 
 const product = ref(new Product());
+const trackingID = ref("");
 
 const isSeller = computed(() => {
   if (!workspace.wallet.value || !product.value.seller) return false;
@@ -37,14 +54,37 @@ const showBuy = computed(
   () => !isSeller.value && product.value?.stage === "initiate"
 );
 
+const showUpdateShippingDetail = computed(
+  () => isSeller.value && product.value?.stage === "waitForShipping"
+);
+
+const showWithdraw = computed(
+  () => isSeller.value && product.value?.stage === "delivered"
+);
+
 watchEffect(async () => {
   if (route.params.pubkey) {
-    product.value = await getProductByID(workspace, route.params.pubkey);
+    await loadProduct(route.params.pubkey);
   }
 });
 
+async function loadProduct(pubkey) {
+  product.value = await getProductByID(workspace, pubkey);
+}
+
 async function order() {
   await createOrder(workspace, product.value);
+  await loadProduct(product.value.publicKeyBase58);
+}
+
+async function updateTracking() {
+  await updateShippingDetail(workspace, product.value, trackingID.value);
+  await loadProduct(product.value.publicKeyBase58);
+}
+
+async function withdraw() {
+  await withdrawFund(workspace, product.value);
+  router.push("/");
 }
 </script>
 <style scoped></style>

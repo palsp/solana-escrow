@@ -272,6 +272,26 @@ describe("halffin", () => {
         },
       });
 
+      // const ix = program.instruction.updateShippingDetail(trackingID, {
+      //   accounts: {
+      //     authority: provider.wallet.publicKey,
+      //     productAccount,
+      //   },
+      // });
+
+      // const ix2 = program.instruction.fulfillShippingDetail({
+      //   accounts: {
+      //     authority: provider.wallet.publicKey,
+      //     productAccount,
+      //   },
+      // })
+
+      // const tx = new anchor.web3.Transaction()
+      // tx.add(ix)
+      // tx.add(ix2)
+
+      // provider.send(tx)
+
       // withdraw fund
 
       const [pdaAccount] = await anchor.web3.PublicKey.findProgramAddress(
