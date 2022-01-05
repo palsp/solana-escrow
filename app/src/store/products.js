@@ -154,5 +154,12 @@ export default {
       await dispatch("getProducts", workspace);
       await dispatch("filterProducts", workspace);
     },
+    async getMyPurchase({ commit }, workspace) {
+      const myPurchase = await getProducts(workspace, [
+        buyerFilter(workspace.wallet.value.publicKey.toBase58()),
+      ]);
+
+      commit("setMyPurchase", myPurchase);
+    },
   },
 };
