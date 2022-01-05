@@ -15,9 +15,9 @@
         :class="`option ${index === selectedModeIndex ? 'active' : ''}`"
         v-for="(mode, index) in modes"
         @click="changeMode(index)"
-        :key="mode"
+        :key="mode.name"
       >
-        {{ mode }}
+        {{ mode.name }} ({{ mode.amount }})
       </p>
     </section>
     <section class="tabs">
@@ -25,9 +25,9 @@
         :class="`tab ${index === selectedTabIndex ? 'active' : ''}`"
         v-for="(tab, index) in subTabs"
         @click="changeTab(index)"
-        :key="tab"
+        :key="tab.name"
       >
-        {{ tab }}
+        {{ tab.name }} ( {{ tab.amount }} )
       </p>
     </section>
     <section class="product-section">
@@ -41,6 +41,7 @@
 </template>
 <script setup>
 import { computed, watchEffect, ref } from "vue";
+import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { useWorkspace } from "@/composables";
 
@@ -48,41 +49,94 @@ const store = useStore();
 const workspace = useWorkspace();
 const hideAccountSummary = ref(false);
 const searchTerm = ref("");
+const { query } = useRoute();
 
 const toggleHideAccountSummary = () => {
   hideAccountSummary.value = !hideAccountSummary.value;
 };
+const myProducts = computed(() => store.getters["products/myProducts"]);
+const myPurchase = computed(() => store.getters["products/myPurchase"]);
+const myInitiateProducts = computed(
+  () => store.getters["products/myInitiateProducts"]
+);
+const myWaitingForShipmentProducts = computed(
+  () => store.getters["products/myWaitingForShipmentProducts"]
+);
+const myShippingProducts = computed(
+  () => store.getters["products/myShippingProducts"]
+);
+const myDeliveredProducts = computed(
+  () => store.getters["products/myDeliveredProducts"]
+);
+
+const myWaitingForShipmentPurchase = computed(
+  () => store.getters["products/myWaitingForShipmentPurchase"]
+);
+const myShippingPurchase = computed(
+  () => store.getters["products/myShippingPurchase"]
+);
+const myDeliveredPurchase = computed(
+  () => store.getters["products/myDeliveredPurchase"]
+);
 
 const items = computed(() => {
   if (selectedModeIndex.value === 0) {
     switch (selectedTabIndex.value) {
       case 0:
-        return store.getters["products/myInitiateProducts"];
+        return myInitiateProducts.value;
       case 1:
-        return store.getters["products/myWaitingForShipmentProducts"];
+        return myWaitingForShipmentProducts.value;
       case 2:
-        return store.getters["products/myShippingProducts"];
+        return myShippingProducts.value;
       case 3:
-        return store.getters["products/myDeliveredProducts"];
+        return myDeliveredProducts.value;
     }
   }
   switch (selectedTabIndex.value) {
     case 0:
-      return store.getters["products/myWaitingForShipmentPurchase"];
+      return myWaitingForShipmentPurchase.value;
     case 1:
-      return store.getters["products/myShippingPurchase"];
+      return myShippingPurchase.value;
     default:
-      return store.getters["products/myDeliveredPurchase"];
+      return myDeliveredPurchase.value;
   }
 });
 
-const selectedModeIndex = ref(0);
-const selectedTabIndex = ref(0);
-const modes = ["My Product", "My Purchase"];
+const modes = [
+  { name: "My Product", amount: myProducts.value.length },
+  { name: "My Purchase", amount: myPurchase.value.length },
+];
+const selectedModeIndex = ref(
+  query.mode && +query.mode < modes.length ? +query.mode : 0
+);
 const subTabs = computed(() =>
   selectedModeIndex.value === 0
-    ? ["initiate", "wait for shipment", "shipment in progress", "delivered"]
-    : ["wait for shipment", "shipment in progress", "delivered"]
+    ? [
+        { name: "initiate", amount: myInitiateProducts.value.length },
+        {
+          name: "wait for shipment",
+          amount: myWaitingForShipmentProducts.value.length,
+        },
+        {
+          name: "shipment in progress",
+          amount: myShippingProducts.value.length,
+        },
+        { name: "delivered", amount: myDeliveredProducts.value.length },
+      ]
+    : [
+        {
+          name: "wait for shipment",
+          amount: myWaitingForShipmentPurchase.value.length,
+        },
+        {
+          name: "shipment in progress",
+          amount: myShippingPurchase.value.length,
+        },
+        { name: "delivered", amount: myDeliveredPurchase.value.length },
+      ]
+);
+const selectedTabIndex = ref(
+  query.tab && +query.tab < subTabs.value.length ? +query.tab : 0
 );
 
 const changeTab = (index) => {

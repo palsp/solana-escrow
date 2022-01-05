@@ -101,7 +101,8 @@ async function submit() {
   confirmTransaction(workspace, txid, notify, () => {
     store.dispatch("products/addProduct", { workspace, productPubkeyBase58 });
   });
-  router.push("/");
+  // navigate to profile page , my products , and initiate
+  router.push({ path: "/profile", query: { mode: 0, tab: 0 } });
 }
 </script>
 <style scoped>

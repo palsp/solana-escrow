@@ -1,11 +1,14 @@
 [programs.localnet]
 halffin = "28Y6Ezy4za168iKHsWb1iUih7pDw1NzBWFJ4Kya8FmQb"
 
+[programs.devnet]
+halffin = "28Y6Ezy4za168iKHsWb1iUih7pDw1NzBWFJ4Kya8FmQb"
+
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/Users/supasinliulaks/.config/solana/id.json"
 
 [scripts]
