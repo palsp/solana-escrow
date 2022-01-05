@@ -1,5 +1,4 @@
-import { getProducts, sellerFilter, buyerFilter } from "@/api";
-import { getTokenAccounts } from "@/utils";
+import { getProducts, sellerFilter, buyerFilter, getProductByID } from "@/api";
 import { stage } from "../models";
 export default {
   namespaced: true,
@@ -7,7 +6,21 @@ export default {
     products: [],
     myProducts: [],
     myPurchase: [],
+    myInitiateProducts: [],
+
+    myWaitingForShipmentProducts: [],
+
+    myShippingProducts: [],
+
+    myDeliveredProducts: [],
+
+    myWaitingForShipmentPurchase: [],
+
+    myShippingPurchase: [],
+
+    myDeliveredPurchase: [],
   },
+
   getters: {
     products(state) {
       return state.products;
@@ -20,44 +33,30 @@ export default {
     },
 
     myInitiateProducts(state) {
-      return state.myProducts.filter(
-        (product) => product.stage === stage.initiate
-      );
+      return state.myInitiateProducts;
     },
 
     myWaitingForShipmentProducts(state) {
-      return state.myProducts.filter(
-        (product) => product.stage === stage.waitForShipping
-      );
+      return state.myWaitingForShipmentProducts;
     },
 
     myShippingProducts(state) {
-      return state.myProducts.filter(
-        (product) => product.stage === stage.shippingInProgress
-      );
+      return state.myShippingProducts;
     },
 
     myDeliveredProducts(state) {
-      return state.myProducts.filter(
-        (product) => product.stage === stage.delivered
-      );
+      return state.myDeliveredProducts;
     },
 
     myWaitingForShipmentPurchase(state) {
-      return state.myPurchase.filter(
-        (product) => product.stage === stage.waitForShipping
-      );
+      return state.myWaitingForShipmentPurchase;
     },
     myShippingPurchase(state) {
-      return state.myPurchase.filter(
-        (product) => product.stage === stage.shippingInProgress
-      );
+      return state.myShippingPurchase;
     },
 
     myDeliveredPurchase(state) {
-      return state.myPurchase.filter(
-        (product) => product.stage === stage.delivered
-      );
+      return state.myDeliveredPurchase;
     },
   },
   mutations: {
@@ -69,6 +68,23 @@ export default {
     },
     setMyPurchase(state, myPurchase) {
       state.myPurchase = myPurchase;
+    },
+    setFilterProducts(state, myProducts) {
+      state.myInitiateProducts = myProducts[0];
+      state.myWaitingForShipmentProducts = myProducts[1];
+      state.myShippingProducts = myProducts[2];
+      state.myDeliveredProducts = myProducts[3];
+    },
+
+    setFilterPurchase(state, myPurchase) {
+      state.myWaitingForShipmentPurchase = myPurchase[0];
+      state.myShippingPurchase = myPurchase[1];
+      state.myDeliveredPurchase = myPurchase[2];
+    },
+    addProduct(state, product) {
+      state.product.push(product);
+      state.myProducts.push(product);
+      state.myInitiateProducts.push(product);
     },
   },
   actions: {
@@ -82,18 +98,61 @@ export default {
       ]);
       commit("setMyProducts", myProducts);
     },
-    async refresh({ dispatch }, workspace) {
-      await Promise.all([
-        dispatch("getProducts", workspace),
-        dispatch("getMyProducts", workspace),
-      ]);
+    async addProduct({ commit }, { workspace, productPubkeyBase58 }) {
+      const product = await getProductByID(workspace, productPubkeyBase58);
+      commit("addProduct", product);
     },
+    async incrementProductStage({ dispatch }, workspace, product) {},
     async getMyPurchase({ commit }, workspace) {
       const myPurchase = await getProducts(workspace, [
         buyerFilter(workspace.wallet.value.publicKey.toBase58()),
       ]);
 
       commit("setMyPurchase", myPurchase);
+    },
+
+    async filterProducts({ commit, state, dispatch }, workspace) {
+      await dispatch("getMyProducts", workspace);
+      await dispatch("getMyPurchase", workspace);
+
+      const myProducts = [[], [], [], []];
+      for (const product of state.myProducts) {
+        switch (product.stage) {
+          case stage.initiate:
+            myProducts[0].push(product);
+            break;
+          case stage.waitForShipping:
+            myProducts[0].push(product);
+            break;
+          case stage.shippingInProgress:
+            myProducts[0].push(product);
+            break;
+          case stage.delivered:
+            myProducts[0].push(product);
+            break;
+        }
+      }
+      const myPurchase = [[], [], []];
+      for (const purchase of state.myPurchase) {
+        switch (purchase.stage) {
+          case stage.waitForShipping:
+            myPurchase[0].push(purchase);
+            break;
+          case stage.shippingInProgress:
+            myPurchase[1].push(purchase);
+            break;
+          case stage.delivered:
+            myPurchase[2].push(purchase);
+            break;
+        }
+      }
+      commit("setFilterProducts", myProducts);
+      commit("setFilterPurchase", myPurchase);
+    },
+
+    async refresh({ dispatch }, workspace) {
+      await dispatch("getProducts", workspace);
+      await dispatch("filterProducts", workspace);
     },
   },
 };

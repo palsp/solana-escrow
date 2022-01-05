@@ -32,7 +32,7 @@ export const createProduct = async (
   const token = getTokenSymbolByMintAddress(mintAddress);
   const price = new BN(+productData.price * 1 * 10 ** token.decimals);
 
-  return program.value.rpc.initializeProduct(
+  const txid = await program.value.rpc.initializeProduct(
     productData.name,
     productAccountBump,
     price,
@@ -48,6 +48,8 @@ export const createProduct = async (
       preInstructions: transactions,
     }
   );
+
+  return [txid, productAccount];
 };
 
 export const createProductOfSol = async ({ wallet, program }, productData) => {
@@ -57,7 +59,7 @@ export const createProductOfSol = async ({ wallet, program }, productData) => {
     program.value.programId
   );
 
-  return program.value.rpc.initializeProductSol(
+  const txid = await program.value.rpc.initializeProductSol(
     productData.name,
     productAccountBump,
     new BN(+productData.price * 1 * 10 ** NATIVE_SOL.decimals),
@@ -70,4 +72,6 @@ export const createProductOfSol = async ({ wallet, program }, productData) => {
       },
     }
   );
+
+  return [txid, productAccount];
 };

@@ -100,11 +100,11 @@ const changeTab = (index) => {
 
 const changeMode = (index) => {
   selectedModeIndex.value = index;
+  selectedTabIndex.value = 0;
 };
 
 watchEffect(() => {
-  store.dispatch("products/getMyPurchase", workspace);
-  store.dispatch("products/getMyProducts", workspace);
+  store.dispatch("products/filterProducts", workspace);
 });
 </script>
 <style scoped>

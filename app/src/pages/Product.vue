@@ -37,10 +37,12 @@ import { useWorkspace, useNotify } from "@/composables";
 import { Product } from "@/models";
 import { createOrder, updateShippingDetail, withdrawFund } from "@/api";
 import { confirmTransaction } from "@/utils";
+import { useStore } from "vuex";
 
 const route = useRoute();
 const router = useRouter();
 const workspace = useWorkspace();
+const store = useStore();
 const { notify } = useNotify();
 
 const product = ref(new Product());

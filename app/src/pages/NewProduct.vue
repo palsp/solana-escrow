@@ -93,9 +93,13 @@ const charLimitClass = computed(() => {
 });
 
 async function submit() {
-  const txid = await createProduct(workspace, product, currencyAddress.value);
+  const [txid, productPubkeyBase58] = await createProduct(
+    workspace,
+    product,
+    currencyAddress.value
+  );
   confirmTransaction(workspace, txid, notify, () => {
-    store.dispatch("products/refresh", workspace);
+    store.dispatch("products/addProduct", { workspace, productPubkeyBase58 });
   });
   router.push("/");
 }
