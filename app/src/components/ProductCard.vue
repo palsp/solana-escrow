@@ -1,10 +1,10 @@
 <template>
   <router-link :to="`/product/${product.publicKeyBase58}`">
     <div class="card">
-      <h2>
-        {{ product.name }}
+      <h2 class="title">
+        {{ name }}
       </h2>
-      <!-- <p>Owner : {{ owner }}</p> -->
+      <base-image :image-url="product.imageUrl"></base-image>
       <p>
         Price : {{ product.priceEther }}
         {{ product.tokenSymbol }}
@@ -24,11 +24,25 @@ const props = defineProps({
 });
 
 const { product } = toRefs(props);
+
+const name = computed(() => {
+  return product.value.name.toUpperCase();
+});
 </script>
 <style scoped>
+a {
+  color: black;
+  text-decoration: none;
+}
 .card {
   border: 1px solid #ccc;
-  width: 90%;
+  width: 20vw;
+  height: 25vh;
   margin: 1rem;
+  padding: 1rem;
+}
+
+.title {
+  border-bottom: 1px solid black;
 }
 </style>

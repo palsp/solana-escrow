@@ -5,9 +5,11 @@ import router from "./router";
 import store from "./store";
 
 import ProductCard from "@/components/ProductCard.vue";
+import BaseImage from "@/components/ui/BaseImage.vue";
 const app = createApp(App);
 
 app.component("ProductCard", ProductCard);
+app.component("BaseImage", BaseImage);
 app.use(store);
 app.use(router);
 

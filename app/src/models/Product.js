@@ -24,4 +24,8 @@ export class Product {
   get publicKeyBase58() {
     return this.publicKey ? this.publicKey.toBase58() : null;
   }
+
+  get imageUrl() {
+    return "https://picsum.photos/200";
+  }
 }
