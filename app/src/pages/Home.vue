@@ -9,10 +9,20 @@
 </template>
 <script setup>
 import { useStore } from "vuex";
-import { computed } from "@vue/reactivity";
+import { computed } from "vue";
+import { useWorkspace } from "@/composables";
 
 const store = useStore();
-const products = computed(() => store.getters["products/products"]);
+const { wallet } = useWorkspace();
+
+const products = computed(() => {
+  let _products = store.getters["products/products"];
+  if (!wallet.value) return _products;
+
+  return _products.filter(
+    (product) => !product.seller.equals(wallet.value.publicKey)
+  );
+});
 </script>
 <style scoped>
 .product-section {
