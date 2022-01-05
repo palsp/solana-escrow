@@ -1,27 +1,14 @@
 <template>
   <div>
     <section class="token-section">
-      <table class="token-table">
-        <thead>
-          <tr>
-            <th>SYMBOL</th>
-            <th>BALANCE</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="[mintAddress, tokenAccount] in Object.entries(tokenAccounts)"
-            :key="tokenAccount.tokenAccountAddress"
-          >
-            <td>
-              {{ getTokenSymbolByMintAddress(mintAddress)?.symbol }}
-            </td>
-
-            <td>{{ tokenAccount.balance.toEther() }}</td>
-            <!-- <td>{{ tokenAccount.tokenAccountAddress }}</td> -->
-          </tr>
-        </tbody>
-      </table>
+      <button class="token-btn" @click="toggleHideAccountSummary">
+        {{ hideAccountSummary ? "show" : "hide" }}
+      </button>
+      <account-summary
+        v-if="!hideAccountSummary"
+        :search-term="searchTerm"
+        @search="(_search) => (searchTerm = _search)"
+      />
     </section>
     <section class="option-section">
       <p
@@ -56,10 +43,15 @@
 import { computed, watchEffect, ref } from "vue";
 import { useStore } from "vuex";
 import { useWorkspace } from "@/composables";
-import { getTokenSymbolByMintAddress } from "@/utils";
 
 const store = useStore();
 const workspace = useWorkspace();
+const hideAccountSummary = ref(false);
+const searchTerm = ref("");
+
+const toggleHideAccountSummary = () => {
+  hideAccountSummary.value = !hideAccountSummary.value;
+};
 
 const items = computed(() => {
   if (selectedModeIndex.value === 0) {
@@ -83,7 +75,6 @@ const items = computed(() => {
       return store.getters["products/myDeliveredPurchase"];
   }
 });
-const tokenAccounts = computed(() => store.getters["wallet/tokenAccounts"]);
 
 const selectedModeIndex = ref(0);
 const selectedTabIndex = ref(0);
@@ -115,12 +106,22 @@ section {
   width: 100%;
   display: flex;
   justify-content: center;
+  position: relative;
 }
 
-.token-table {
-  margin: 1rem;
+.token-btn {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  padding: 1rem;
+  border-radius: 50%;
+  border: none;
 }
 
+.token-btn:hover {
+  background: #f391e3;
+  cursor: pointer;
+}
 .option-section,
 .tabs {
   display: flex;
