@@ -16,7 +16,9 @@
             <td>
               {{ getTokenSymbolByMintAddress(mintAddress)?.symbol }}
             </td>
+
             <td>{{ tokenAccount.balance.toEther() }}</td>
+            <!-- <td>{{ tokenAccount.tokenAccountAddress }}</td> -->
           </tr>
         </tbody>
       </table>

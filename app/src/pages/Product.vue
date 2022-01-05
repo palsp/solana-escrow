@@ -33,13 +33,15 @@
 import { ref, watchEffect, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getProductByID } from "@/api";
-import { useWorkspace } from "@/composables";
+import { useWorkspace, useNotify } from "@/composables";
 import { Product } from "@/models";
 import { createOrder, updateShippingDetail, withdrawFund } from "@/api";
+import { confirmTransaction } from "@/utils";
 
 const route = useRoute();
 const router = useRouter();
 const workspace = useWorkspace();
+const { notify } = useNotify();
 
 const product = ref(new Product());
 const trackingID = ref("");
@@ -73,8 +75,10 @@ async function loadProduct(pubkey) {
 }
 
 async function order() {
-  await createOrder(workspace, product.value);
-  await loadProduct(product.value.publicKeyBase58);
+  const txid = await createOrder(workspace, product.value);
+  confirmTransaction(workspace, txid, notify, () => {
+    loadProduct(product.value.publicKeyBase58);
+  });
 }
 
 async function updateTracking() {
