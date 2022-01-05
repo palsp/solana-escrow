@@ -9,7 +9,7 @@
         Price : {{ product.priceEther }}
         {{ product.tokenSymbol }}
       </p>
-      <!-- <p>Locktime : {{ lockTime }}</p> -->
+      <p>Stage : {{ product.stage }}</p>
       <p v-if="!!product.trackingId">Tracking ID : {{ product.trackingId }}</p>
     </div>
   </router-link>
@@ -37,7 +37,7 @@ a {
 .card {
   border: 1px solid #ccc;
   width: 20vw;
-  height: 25vh;
+  height: 30vh;
   margin: 1rem;
   padding: 1rem;
 }

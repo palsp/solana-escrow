@@ -30,3 +30,10 @@ export class Product {
     return "https://picsum.photos/200";
   }
 }
+
+export const stage = {
+  initiate: "initiate",
+  waitForShipping: "waitForShipping",
+  shippingInProgress: "shippingInProgress",
+  delivered: "delivered",
+};
