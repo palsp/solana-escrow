@@ -17,8 +17,10 @@ export const getTxExplorerUrl = (txId) => {
   switch (config.cluster) {
     case "localnet":
       params = "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899";
+      break;
     case "devnet":
       params = "?cluster=devnet";
+      break;
     default:
       params = "";
   }

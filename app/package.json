@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@project-serum/anchor": "^0.19.1-beta.1",
+    "@solana/spl-token": "^0.1.8",
     "@solana/wallet-adapter-base": "^0.8.1",
     "@solana/wallet-adapter-vue": "^0.4.1",
     "@solana/wallet-adapter-vue-ui": "^0.2.0",
@@ -47,9 +48,9 @@
       "parser": "babel-eslint"
     },
     "rules": {
-      "vue/no-multiple-template-root" : 0,
-      "no-unused-vars" : "warn",
-      "no-undef" : "warn"
+      "vue/no-multiple-template-root": 0,
+      "no-unused-vars": "warn",
+      "no-undef": "warn"
     }
   },
   "browserslist": [
