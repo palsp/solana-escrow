@@ -102,7 +102,6 @@ export default {
       const product = await getProductByID(workspace, productPubkeyBase58);
       commit("addProduct", product);
     },
-    async incrementProductStage({ dispatch }, workspace, product) {},
     async getMyPurchase({ commit }, workspace) {
       const myPurchase = await getProducts(workspace, [
         buyerFilter(workspace.wallet.value.publicKey.toBase58()),
@@ -153,13 +152,6 @@ export default {
     async refresh({ dispatch }, workspace) {
       await dispatch("getProducts", workspace);
       await dispatch("filterProducts", workspace);
-    },
-    async getMyPurchase({ commit }, workspace) {
-      const myPurchase = await getProducts(workspace, [
-        buyerFilter(workspace.wallet.value.publicKey.toBase58()),
-      ]);
-
-      commit("setMyPurchase", myPurchase);
     },
   },
 };
