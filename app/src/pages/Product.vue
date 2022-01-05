@@ -82,13 +82,21 @@ async function order() {
 }
 
 async function updateTracking() {
-  await updateShippingDetail(workspace, product.value, trackingID.value);
-  await loadProduct(product.value.publicKeyBase58);
+  const txid = await updateShippingDetail(
+    workspace,
+    product.value,
+    trackingID.value
+  );
+  confirmTransaction(workspace, txid, notify, () => {
+    loadProduct(product.value.publicKeyBase58);
+  });
 }
 
 async function withdraw() {
-  await withdrawFund(workspace, product.value);
-  router.push("/");
+  const txid = await withdrawFund(workspace, product.value);
+  confirmTransaction(workspace, txid, notify, () => {
+    router.push("/");
+  });
 }
 </script>
 <style scoped></style>

@@ -19,6 +19,7 @@ export class Product {
       const token = getTokenSymbolByMintAddress(this.mint);
       this.priceEther = this.price / (1 * 10 ** token.decimals);
       this.tokenSymbol = token.symbol;
+      this.tempTokenAccountPubkey = productData.tempTokenAccountPubkey;
     }
   }
   get publicKeyBase58() {

@@ -33,5 +33,5 @@ export const updateShippingDetail = async (
   const tx = new web3.Transaction();
   tx.add(updateShipmentIX, fulfillIX);
 
-  await provider.value.send(tx);
+  return provider.value.send(tx);
 };
