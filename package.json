@@ -3,6 +3,8 @@
         "start:validator": "solana-test-validator --no-bpf-jit",
         "test": "anchor test --skip-local-validator",
         "start:client": "yarn --cwd app serve",
+        "start:client:devnet": "yarn --cwd app serve --mode devnet",
+        "start:client:mainnet": "yarn --cwd app serve --mode mainnet",
         "copy:idl": "mkdir -p app/src/idl && cp target/idl/halffin.json app/src/idl/halffin.json"
     },
     "dependencies": {

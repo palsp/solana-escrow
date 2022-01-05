@@ -1,3 +1,5 @@
+import config from "@/config";
+
 export const confirmTransaction = ({ connection }, txid, notify, cb) => {
   notify.info();
   connection.onSignature(txid, (signatureResult, _context) => {
@@ -11,6 +13,15 @@ export const confirmTransaction = ({ connection }, txid, notify, cb) => {
 };
 
 export const getTxExplorerUrl = (txId) => {
-  // TODO: support others cluster
-  return `https://explorer.solana.com/tx/${txId}?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899`;
+  let params = "";
+  switch (config.cluster) {
+    case "localnet":
+      params = "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899";
+    case "devnet":
+      params = "?cluster=devnet";
+    default:
+      params = "";
+  }
+
+  return `https://explorer.solana.com/tx/${txId}?${params}`;
 };
