@@ -3,9 +3,8 @@ import { useAnchorWallet } from "@solana/wallet-adapter-vue";
 import idl from "@/idl/halffin.json";
 import { Provider, Program } from "@project-serum/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
-
-// const clusterUrl = process.env.VUE_APP_CLUSTER_URL;
-const clusterUrl = "http://127.0.0.1:8899";
+import config from "@/config";
+const clusterUrl = config.clusterUrl;
 const preflightCommitment = "processed";
 const commitment = "processed";
 const programID = new PublicKey(idl.metadata.address);

@@ -25,5 +25,5 @@ export const getTxExplorerUrl = (txId) => {
       params = "";
   }
 
-  return `https://explorer.solana.com/tx/${txId}?${params}`;
+  return `https://explorer.solana.com/tx/${txId}${params}`;
 };
