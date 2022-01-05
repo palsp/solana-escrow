@@ -16,6 +16,7 @@
   <main>
     <router-view />
   </main>
+  <notify-modal />
 </template>
 
 <script>
@@ -24,9 +25,10 @@ import { watch, watchEffect } from "vue";
 import { useStore } from "vuex";
 import { useWorkspace } from "@/composables";
 import { useWallet } from "@solana/wallet-adapter-vue";
+import NotifyModal from "@/components/NotifyModal.vue";
 
 export default {
-  components: { ConnectWallet },
+  components: { ConnectWallet, NotifyModal },
   setup() {
     const workspace = useWorkspace();
     const store = useStore();

@@ -14,7 +14,6 @@ describe("halffin", () => {
   // Configure the client to use the local cluster.
   const provider = anchor.Provider.env();
   anchor.setProvider(provider);
-
   //@ts-ignore
   const program = anchor.workspace.Halffin as Program<Halffin>;
 
@@ -107,7 +106,7 @@ describe("halffin", () => {
       program.programId
     );
 
-    await program.rpc.createOrder({
+    const tx = await program.rpc.createOrder({
       accounts: {
         buyer: buyer.publicKey,
         productAccount,

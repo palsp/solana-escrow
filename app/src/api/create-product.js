@@ -10,8 +10,7 @@ export const createProduct = async (
   mintAddress
 ) => {
   if (mintAddress === NATIVE_SOL.mintAddress) {
-    await createProductOfSol({ wallet, program }, productData);
-    return;
+    return createProductOfSol({ wallet, program }, productData);
   }
   const [productAccount, productAccountBump] = await findProductAccountAddress(
     wallet.value.publicKey,
@@ -33,7 +32,7 @@ export const createProduct = async (
   const token = getTokenSymbolByMintAddress(mintAddress);
   const price = new BN(+productData.price * 1 * 10 ** token.decimals);
 
-  await program.value.rpc.initializeProduct(
+  return program.value.rpc.initializeProduct(
     productData.name,
     productAccountBump,
     price,
@@ -58,7 +57,7 @@ export const createProductOfSol = async ({ wallet, program }, productData) => {
     program.value.programId
   );
 
-  await program.value.rpc.initializeProductSol(
+  return program.value.rpc.initializeProductSol(
     productData.name,
     productAccountBump,
     new BN(+productData.price * 1 * 10 ** NATIVE_SOL.decimals),

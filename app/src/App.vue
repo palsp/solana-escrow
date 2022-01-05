@@ -1,7 +1,9 @@
 <template>
   <wallet-provider :wallets="wallets">
     <workspace-provider>
-      <Main />
+      <notify-provider>
+        <Main />
+      </notify-provider>
     </workspace-provider>
   </wallet-provider>
 </template>
@@ -13,13 +15,15 @@ import {
 } from "@solana/wallet-adapter-wallets";
 
 import { WalletProvider } from "@solana/wallet-adapter-vue";
-import WorkspaceProvider from "@/components/provider/WorkspaceProvider";
+import WorkspaceProvider from "@/components/provider/WorkspaceProvider.vue";
+import NotifyProvider from "@/components/provider/NotifyProvider.vue";
 import Main from "@/layouts/Main.vue";
 
 export default {
   components: {
     WalletProvider,
     WorkspaceProvider,
+    NotifyProvider,
     Main,
   },
   setup() {

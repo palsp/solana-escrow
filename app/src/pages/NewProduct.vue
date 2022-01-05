@@ -67,12 +67,14 @@ import {
   useWorkspace,
   useCountCharacterLimit,
   useFormInput,
+  useNotify,
 } from "@/composables";
-import { TOKENS_SYMBOL, NATIVE_SOL } from "@/utils";
+import { TOKENS_SYMBOL, NATIVE_SOL, confirmTransaction } from "@/utils";
 
 const workspace = useWorkspace();
 const router = useRouter();
 const store = useStore();
+const { notify } = useNotify();
 // Default currency to native sol
 const currencyAddress = ref(NATIVE_SOL.mintAddress);
 
@@ -91,8 +93,10 @@ const charLimitClass = computed(() => {
 });
 
 async function submit() {
-  await createProduct(workspace, product, currencyAddress.value);
-  await store.dispatch("products/refresh", workspace);
+  const txid = await createProduct(workspace, product, currencyAddress.value);
+  confirmTransaction(workspace, txid, notify, () => {
+    store.dispatch("products/refresh", workspace);
+  });
   router.push("/");
 }
 </script>

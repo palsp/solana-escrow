@@ -14,8 +14,6 @@ export const withdrawSol = async ({ wallet, program }, product) => {
     product.name,
     program.value.programId
   );
-  console.log(productAccount.toBase58());
-  console.log(pdaAccount.toBase58());
   const [pdaAccount] = await findPDAAccount(
     [Buffer.from(ESCROW_VAULT_SEED)],
     program.value.programId
