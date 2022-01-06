@@ -121,13 +121,13 @@ export default {
             myProducts[0].push(product);
             break;
           case stage.waitForShipping:
-            myProducts[0].push(product);
+            myProducts[1].push(product);
             break;
           case stage.shippingInProgress:
-            myProducts[0].push(product);
+            myProducts[2].push(product);
             break;
           case stage.delivered:
-            myProducts[0].push(product);
+            myProducts[3].push(product);
             break;
         }
       }

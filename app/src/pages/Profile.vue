@@ -51,6 +51,10 @@ const hideAccountSummary = ref(false);
 const searchTerm = ref("");
 const { query } = useRoute();
 
+watchEffect(async () => {
+  await store.dispatch("products/filterProducts", workspace);
+});
+
 const toggleHideAccountSummary = () => {
   hideAccountSummary.value = !hideAccountSummary.value;
 };
@@ -102,12 +106,12 @@ const items = computed(() => {
   }
 });
 
-const modes = [
+const modes = computed(() => [
   { name: "My Product", amount: myProducts.value.length },
   { name: "My Purchase", amount: myPurchase.value.length },
-];
+]);
 const selectedModeIndex = ref(
-  query.mode && +query.mode < modes.length ? +query.mode : 0
+  query.mode && +query.mode < modes.value.length ? +query.mode : 0
 );
 const subTabs = computed(() =>
   selectedModeIndex.value === 0
@@ -147,10 +151,6 @@ const changeMode = (index) => {
   selectedModeIndex.value = index;
   selectedTabIndex.value = 0;
 };
-
-watchEffect(() => {
-  store.dispatch("products/filterProducts", workspace);
-});
 </script>
 <style scoped>
 section {
