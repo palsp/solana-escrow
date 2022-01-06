@@ -15,14 +15,6 @@ export const initNotify = (timeout = 8000) => {
     title: "",
   });
 
-  // const notify = (message) => {
-  //   showNotification.value = true;
-  //   alert(message);
-
-  //   setTimeout(() => {
-  //     showNotification.value = false;
-  //   }, 8000);
-  // };
   const info = (title = "Transaction has been sent") => {
     status.isSuccess = false;
     status.txid = "";
@@ -63,9 +55,18 @@ export const initNotify = (timeout = 8000) => {
     }, timeout);
   };
 
+  const close = () => {
+    if (timeoutId.value) {
+      clearTimeout(timeoutId.value);
+    }
+
+    showNotification.value = false;
+  };
+
   provide(notifySymbol, {
     showNotification,
     ...toRefs(status),
+    close,
     notify: {
       info,
       success,

@@ -5,15 +5,24 @@
       Check your transaction
       <a :href="explorerUrl" target="_blank" rel="noopener noreferrer"> here</a>
     </p>
-    <p v-if="isError">{{ errorMessage }}</p>
+    <p v-else-if="isError">{{ errorMessage }}</p>
+    <p v-else>Please wait for the confirmation</p>
+    <button class="btn" @click="close">X</button>
   </div>
 </template>
 <script setup>
 import { useNotify } from "@/composables";
 import { computed } from "vue";
 import { getTxExplorerUrl } from "@/utils";
-const { showNotification, title, isSuccess, txid, isError, errorMessage } =
-  useNotify();
+const {
+  showNotification,
+  title,
+  isSuccess,
+  txid,
+  isError,
+  errorMessage,
+  close,
+} = useNotify();
 const explorerUrl = computed(() => getTxExplorerUrl(txid.value));
 const status = computed(() => {
   if (isSuccess.value) {
@@ -25,7 +34,7 @@ const status = computed(() => {
   }
 });
 </script>
-<style>
+<style scoped>
 .notify-modal {
   position: fixed;
   height: 150px;
@@ -55,5 +64,20 @@ const status = computed(() => {
 
 .info {
   background: #3498db;
+}
+
+.btn {
+  position: absolute;
+  top: 0px;
+  right: -0.5rem;
+  padding: 0.25rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+}
+
+.btn:hover {
+  background: #f27272;
 }
 </style>

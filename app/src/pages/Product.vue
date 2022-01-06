@@ -1,17 +1,34 @@
 <template>
-  <div>
-    <h2>
-      {{ product.name }}
-    </h2>
-    <!-- <p>Owner : {{ owner }}</p> -->
-    <p>
+  <div class="product">
+    <h1>
+      {{ product.name.toUpperCase() }}
+    </h1>
+
+    <base-image
+      :image-url="product.imageUrl"
+      :styles="{ height: '40vh', width: '50%' }"
+    />
+    <h3>
       Price : {{ product.priceEther }}
       {{ product.tokenSymbol }}
-    </p>
+    </h3>
     <!-- <p>Locktime : {{ lockTime }}</p> -->
-    <p>Stage : {{ product.stage }}</p>
-    <section v-if="showBuy" class="order-section">
-      <button @click="order">BUY</button>
+    <h3>Stage : {{ product.stage }}</h3>
+    <p v-if="!connected">Please Connect Wallet</p>
+
+    <product-action
+      v-else
+      :show-buy="showBuy"
+      :show-update-shipment="showUpdateShippingDetail"
+      :show-withdraw="showWithdraw"
+      :tracking-id="trackingID"
+      @order="order"
+      @tracking-change="(_trackingID) => (trackingID = _trackingID)"
+      @update-tracking="updateTracking"
+      @withdraw="withdraw"
+    />
+    <!-- <section v-if="showBuy" class="order-section">
+      <base-button @click="order">BUY</base-button>
     </section>
     <section class="update-shipment-section">
       <div class="form-group" v-if="showUpdateShippingDetail">
@@ -21,12 +38,12 @@
           placeholder="tracking id......"
           v-model="trackingID"
         />
-        <button @click="updateTracking">UPDATE TRACKING</button>
+        <base-button @click="updateTracking">UPDATE TRACKING</base-button>
       </div>
     </section>
     <section v-if="showWithdraw" class="withdraw-section">
-      <button @click="withdraw">Withdraw Fund</button>
-    </section>
+      <base-button @click="withdraw">Withdraw Fund</base-button>
+    </section> -->
   </div>
 </template>
 <script setup>
@@ -38,12 +55,14 @@ import { Product } from "@/models";
 import { createOrder, updateShippingDetail, withdrawFund } from "@/api";
 import { confirmTransaction } from "@/utils";
 import { useStore } from "vuex";
+import { useWallet } from "@solana/wallet-adapter-vue";
 
 const route = useRoute();
 const router = useRouter();
 const workspace = useWorkspace();
 const store = useStore();
 const { notify } = useNotify();
+const { connected } = useWallet();
 
 const product = ref(new Product());
 const trackingID = ref("");
@@ -101,4 +120,10 @@ async function withdraw() {
   });
 }
 </script>
-<style scoped></style>
+<style scoped>
+.product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>
