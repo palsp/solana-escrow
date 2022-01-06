@@ -1,14 +1,17 @@
 <template>
-  <div class="img" :style="{ backgroundImage: backgroundUri }"></div>
+  <div class="img" :style="{ backgroundImage: backgroundUri, ...styles }"></div>
 </template>
 <script setup>
 import { computed, toRefs } from "vue";
 
 const props = defineProps({
   imageUrl: String,
+  styles: {
+    default: {},
+  },
 });
 
-const { imageUrl } = toRefs(props);
+const { imageUrl, styles } = toRefs(props);
 const backgroundUri = computed(() => `url(${imageUrl.value})`);
 </script>
 <style scoped>
