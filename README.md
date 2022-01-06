@@ -1,6 +1,6 @@
-# HALFFIN SOLANA
+# SOLANA ESCROW
 
-A peer-to-peer real-world assets marketplace where strangers can trade without middlemen. This project is a re implementation of [halffin](https://github.com/palsp/halffin) but integrating with solana blockchain. For learning purpose, We omit the implementation of chainlink oracle and replace it with mocks program call instead.
+A peer-to-peer real-world assets marketplace where strangers can trade without middlemen. This project is a re implementation of [halffin](https://github.com/palsp/halffin) on Solana blockchain. For learning purpose, We omit the implementation of chainlink oracle and replace it with mocks program call instead.
 
 ## Prerequisites
 
